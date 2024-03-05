@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Sign Up</title>
+</head>
+
+<body>
+    <div class="container">
+        <form action="" method="post" class="glass">
+            <div class="form-input">
+                <input type="text" id="fullname" placeholder="Enter Full Name">
+                <p class="err-msg" id="err-fullname"></p>
+            </div>
+            <div class="form-input">
+                <input type="text" id="email" placeholder="Enter Email">
+                <p class="err-msg" id="err-email"></p>
+
+            </div>
+            <div class="form-input">
+                <input type="text" id="mobile" placeholder="Enter Phone No">
+                <p class="err-msg" id="err-mobile"></p>
+
+            </div>
+            <div class="form-input">
+                <input type="text" id="password" placeholder="Enter Password">
+                <p class="err-msg" id="err-password"></p>
+
+            </div>
+            <div class="form-input">
+                <input type="text" id="cpassword" placeholder="Enter Confirm Password">
+                <p class="err-msg" id="err-cpassword"></p>
+
+            </div>
+
+            <a href="./login.html">Already have an account!</a>
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+        </form>
+    </div>
+
+    <script>
+        let form = document.getElementsByTagName("form")
+        let users = []
+
+        let usersString = localStorage.getItem("userData")
+        if (usersString) {
+            users = JSON.parse(usersString)
+        }
+
+        form[0].addEventListener("submit", (e) => {
+            e.preventDefault()
+            let data = {
+                _id: users.length + 1,
+                fullname: e.target[0].value,
+                email: e.target[1].value,
+                mobile: e.target[2].value,
+                password: e.target[3].value,
+                cpassword: e.target[4].value,
+            }
+
+            let existMail = false
+
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].email === data.email) {
+                    existMail = true
+                }
+            }
+
+            if (existMail) {
+                console.log("User already exist,Please Login!");
+                alert("User already exist,Please Login!")
+            }
+            else {
+                let res = formValidation(data)
+
+                if (res.length === 0) {
+                    users.push(data)
+                    localStorage.setItem('userData', JSON.stringify(users))
+                    sessionStorage.setItem("userId", data._id)
+                    window.location.assign("./index.html")
+                }
+                else {
+
+                    const errEle = document.querySelectorAll('.err-msg');
+                    if (errEle.length > 0) {
+                        for (let i = 0; i < errEle.length; i++) {
+                            const id = errEle[i].id;
+
+                            for (let j = 0; j < res.length; j++) {
+                                for (const [key, value] of Object.entries(res[j])) {
+                                    if(`err-${key}` === id){
+                                        errEle[i].classList.add('show')
+                                        errEle[i].innerHTML = value + " !"
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    console.log("Errors : ", res);
+
+                }
+            }
+            // e.target[0].value = ""
+            // e.target[1].value = ""
+            // e.target[2].value = ""
+            // e.target[3].value = ""
+            // e.target[4].value = ""
+        })
+
+        const formValidation = (data) => {
+            let error = []
+
+            if (!data.fullname)
+                error.push({ fullname: "Fullname required" })
+
+            if (!data.email)
+                error.push({ email: "Email required" })
+
+            if (!data.mobile)
+                error.push({ mobile: "Phone No required" })
+
+            if (!data.password)
+                error.push({ password: "Password required" })
+
+            if (!data.cpassword)
+                error.push({ cpassword: "Password Confirmation required" })
+
+            if (data.password !== data.cpassword)
+                error.push({ cpassword: "Passwords do not match" })
+
+            return error
+        }
+    </script>
+</body>
+
+</html>

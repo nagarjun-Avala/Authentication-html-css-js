@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <form action="" method="post" class="glass">
+            <div class="form-input">
+                <input type="text" id="email" placeholder="Enter Email">
+                <p class="err-msg" id="err-email"></p>
+            </div>
+            <div class="form-input">
+                <input type="text" id="password" placeholder="Enter Password">
+                <p class="err-msg" id="err-password"></p>
+            </div>
+
+            <a href="./signup.html">Create new account!</a>
+            <button type="submit" class="btn btn-primary">Log In</button>
+        </form>
+    </div>
+
+    <script>
+        let form = document.getElementsByTagName("form")
+
+        let users = []
+
+        let usersString = localStorage.getItem("userData")
+        if (usersString) {
+            users = JSON.parse(usersString)
+        }
+
+
+        form[0].addEventListener("submit", (e) => {
+            e.preventDefault()
+            let user = {}
+            let data = {
+                email: e.target[0].value,
+                password: e.target[1].value,
+            }
+
+
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].email === data.email) {
+                    user = { ...users[i] }
+                }
+            }
+
+            if (!user) {
+                console.log("User does not exist,Please create new account!");
+                alert("User does not exist,Please create new account!")
+            }
+            else {
+                let res = formValidation(data)
+
+                if (res.length === 0) {
+                    if (user.password !== data.password) {
+                        console.log("Invalid credentialls");
+                        e.target[1].value = ""
+                    }
+                    else {
+                        sessionStorage.setItem("userId", user._id)
+                        window.location.assign("./index.html")
+                    }
+
+                }
+                else {
+                    console.log("Errors : ", res);
+                }
+            }
+        })
+
+        const formValidation = (data) => {
+            let error = []
+
+            if (!data.email)
+                error.push({ fullname: "Email required" })
+
+            if (!data.password)
+                error.push({ fullname: "Password required" })
+
+            return error
+        }
+    </script>
+</body>
+
+</html>
